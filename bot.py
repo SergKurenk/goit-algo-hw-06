@@ -1,4 +1,5 @@
 from collections import UserDict
+import re
 
 class Field: #Базовий клас для полів запису.
     def __init__(self, value):
@@ -15,10 +16,13 @@ class Name(Field): #Клас для зберігання імені контак
 #     Реалізовано валідацію номера телефону (має бути перевірка на 10 цифр).
 #     Наслідує клас Field. Значення зберігaється в полі value .
 class Phone(Field): #Клас для зберігання номера телефону. Має валідацію формату (10 цифр).
-    if check_phone(self.value) is False:
-        raise ValueError("Invalid phone number format.")
-    else:
-        super().__init__(self.value)
+    #super().__init__(value)
+    # match = re.match(r'^\+?\d{7,15}$', self.value)
+   
+    # if match is None:
+    #     raise ValueError("Invalid phone number format.")
+    # return self.value
+    pass
 
 # 2. Клас Record:
 #     Реалізовано зберігання об'єкта Name в атрибуті name.
@@ -51,9 +55,6 @@ class Record: #Клас для зберігання інформації про 
         #         return
             
 
-
-
-
     
     # реалізація класу
     def __str__(self):
@@ -66,6 +67,10 @@ class Record: #Клас для зберігання інформації про 
 #     Реалізовано метод delete, який видаляє запис за ім'ям.
 #     Реалізовано магічний метод __str__ для красивого виводу об’єкту класу AddressBook .
 class AddressBook(UserDict): #Клас для зберігання та управління записами.
+    def __init__(self):
+        super().__init__()
+        self.data = {}
+
     def add_record(self, record: Record):
         self.data[record.name.value] = record
     
@@ -127,7 +132,6 @@ class AddressBook(UserDict): #Клас для зберігання та упра
 
 
 
-import re
 
 def input_error_decorator(func):
     def inner(*args, **kwargs):
