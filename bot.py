@@ -10,24 +10,26 @@ class Field: #Базовий клас для полів запису.
 
 class Name(Field): #Клас для зберігання імені контакту. Обов'язкове поле.
     # реалізація класу
-		pass
+	pass
 
 # 3. Клас Phone:
 #     Реалізовано валідацію номера телефону (має бути перевірка на 10 цифр).
 #     Наслідує клас Field. Значення зберігaється в полі value .
 class Phone(Field): #Клас для зберігання номера телефону. Має валідацію формату (10 цифр).
-    #super().__init__(value)
-    # match = re.match(r'^\+?\d{7,15}$', self.value)
-   
-    # if match is None:
-    #     raise ValueError("Invalid phone number format.")
-    # return self.value
-    pass
+    def __init__(self, value):
+        match = re.match(r'^\d{10}$', value)
+#        match = re.match(r'^\+?\d{7,15}$', value)
+        if match:
+            super().__init__(value)
+        else:
+            raise ValueError("Invalid phone number format.")
+        #return self.value
+        #pass
 
 # 2. Клас Record:
 #     Реалізовано зберігання об'єкта Name в атрибуті name.
 #     Реалізовано зберігання списку об'єктів Phone в атрибуті phones.
-#     Реалізовано метод для додавання - add_phone .На вхід подається рядок, який містить номер телефона.
+#     Реалізовано метод для додавання - add_phone. На вхід подається рядок, який містить номер телефона.
 #     Реалізовано метод для видалення - remove_phone. На вхід подається рядок, який містить номер телефона.
 #     Реалізовано метод для редагування - edit_phone. На вхід подається два аргумента - рядки, які містять старий номер телефона та новий. У разі некоректності вхідних даних метод має завершуватись помилкою ValueError.
 #     Реалізовано метод для пошуку об'єктів Phone - find_phone. На вхід подається рядок, який містить номер телефона. Метод має повертати або об’єкт Phone, або None .
@@ -37,36 +39,35 @@ class Record: #Клас для зберігання інформації про 
         self.phones = []
 
     def add_phone(self, phone_number: str):
-        if Phone(phone_number):
-            self.phones.append(phone_number)
-        else:
-            raise ValueError("Invalid phone number format.")
+        self.phones.append(phone_number)
     
     def remove_phone(self, phone_number: str):
         try:
             self.phones.remove(Phone(phone_number))
         except:
-            return "Phone number not found."
+            raise KeyError("Phone number not found.")
     
     def edit_phone(self, old_phone_number: str, new_phone_number: str):
         phone = Phone(new_phone_number)
-        if not phone:
-            raise ValueError("New phone number is invalid.")
-        
+        # if not phone:
+        #     raise ValueError("New phone number is invalid.")
         for i, phone in enumerate(self.phones):
-            if phone.value == old_phone_number:
+            # if phone.value == old_phone_number:
+            if phone == old_phone_number:
                 self.phones[i] = new_phone_number
-                return
             
     def find_phone(self, phone_number: str):
         for phone in self.phones:
-            if phone.value == phone_number:
+            # if phone.value == phone_number:
+            if phone == phone_number:
                 return phone
         return None
 
     # реалізація класу
+
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
+        #return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 # 1. Клас AddressBook:
 #     Має наслідуватись від класу UserDict .
@@ -76,7 +77,7 @@ class Record: #Клас для зберігання інформації про 
 #     Реалізовано магічний метод __str__ для красивого виводу об’єкту класу AddressBook .
 class AddressBook(UserDict): #Клас для зберігання та управління записами.
     def __init__(self):
-        super().__init__()
+        # super().__init__()
         self.data = {}
 
     def __str__(self):
