@@ -1,6 +1,11 @@
 from collections import UserDict
 import re
 
+class MyExceptionValueError(Exception):
+    def __init__(self, message="Формат даних заданий невірно!"):
+        self.message = message
+        super().__init__(message)
+
 class Field: #Базовий клас для полів запису.
     def __init__(self, value):
         self.value = value
@@ -18,11 +23,10 @@ class Name(Field): #Клас для зберігання імені контак
 class Phone(Field): #Клас для зберігання номера телефону. Має валідацію формату (10 цифр).
     def __init__(self, value):
         match = re.match(r'^\d{10}$', value)
-#        match = re.match(r'^\+?\d{7,15}$', value)
-        if match:
+        if match is not None:
             super().__init__(value)
         else:
-            raise ValueError("Invalid phone number format.")
+            raise MyExceptionValueError(f"Invalid phone number format: {value}")
         #return self.value
         #pass
 
@@ -39,7 +43,9 @@ class Record: #Клас для зберігання інформації про 
         self.phones = []
 
     def add_phone(self, phone_number: str):
-        self.phones.append(phone_number)
+        phone = Phone(phone_number)
+        # print(phone)
+        self.phones.append(phone.value)
     
     def remove_phone(self, phone_number: str):
         try:
@@ -67,7 +73,6 @@ class Record: #Клас для зберігання інформації про 
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
-        #return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 # 1. Клас AddressBook:
 #     Має наслідуватись від класу UserDict .
@@ -82,8 +87,11 @@ class AddressBook(UserDict): #Клас для зберігання та упра
 
     def __str__(self):
         result = "Address Book:\n"
-        for record in self.data.values():
-            result += str(record) + "\n"
+        # print(str(self.data.get("John")))
+#ЩОБ ПРАЦЮВАЛО ПОТРІБНО ПЕРЕРОБИТИ СЛОВНИК ПІД: "name": "John"; "phones": "....."
+        for record in self.data:
+            #print(f"---{self.data.get(record)}---")
+            result += f"{self.data.get(record)}" + "\n"
         return result.strip()
 
     def add_record(self, record: Record):
