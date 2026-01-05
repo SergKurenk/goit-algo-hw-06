@@ -2,9 +2,7 @@ from collections import UserDict
 import re
 
 class MyExceptionValueError(Exception):
-    def __init__(self, message="Формат даних заданий невірно!"):
-        self.message = message
-        super().__init__(message)
+    pass
 
 class Field: #Базовий клас для полів запису.
     def __init__(self, value):
@@ -14,7 +12,6 @@ class Field: #Базовий клас для полів запису.
         return str(self.value)
 
 class Name(Field): #Клас для зберігання імені контакту. Обов'язкове поле.
-    # реалізація класу
 	pass
 
 # 3. Клас Phone:
@@ -23,12 +20,9 @@ class Name(Field): #Клас для зберігання імені контак
 class Phone(Field): #Клас для зберігання номера телефону. Має валідацію формату (10 цифр).
     def __init__(self, value):
         match = re.match(r'^\d{10}$', value)
-        if match is not None:
-            super().__init__(value)
-        else:
+        if match is None:
             raise MyExceptionValueError(f"Invalid phone number format: {value}")
-        #return self.value
-        #pass
+        super().__init__(value)
 
 # 2. Клас Record:
 #     Реалізовано зберігання об'єкта Name в атрибуті name.
@@ -44,32 +38,25 @@ class Record: #Клас для зберігання інформації про 
 
     def add_phone(self, phone_number: str):
         phone = Phone(phone_number)
-        # print(phone)
         self.phones.append(phone.value)
     
     def remove_phone(self, phone_number: str):
         try:
-            self.phones.remove(Phone(phone_number))
+            self.phones.remove(str(Phone(phone_number)))
         except:
             raise KeyError("Phone number not found.")
     
     def edit_phone(self, old_phone_number: str, new_phone_number: str):
         phone = Phone(new_phone_number)
-        # if not phone:
-        #     raise ValueError("New phone number is invalid.")
         for i, phone in enumerate(self.phones):
-            # if phone.value == old_phone_number:
             if phone == old_phone_number:
                 self.phones[i] = new_phone_number
             
     def find_phone(self, phone_number: str):
         for phone in self.phones:
-            # if phone.value == phone_number:
             if phone == phone_number:
                 return phone
         return None
-
-    # реалізація класу
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
@@ -82,15 +69,11 @@ class Record: #Клас для зберігання інформації про 
 #     Реалізовано магічний метод __str__ для красивого виводу об’єкту класу AddressBook .
 class AddressBook(UserDict): #Клас для зберігання та управління записами.
     def __init__(self):
-        # super().__init__()
         self.data = {}
 
     def __str__(self):
         result = "Address Book:\n"
-        # print(str(self.data.get("John")))
-#ЩОБ ПРАЦЮВАЛО ПОТРІБНО ПЕРЕРОБИТИ СЛОВНИК ПІД: "name": "John"; "phones": "....."
         for record in self.data:
-            #print(f"---{self.data.get(record)}---")
             result += f"{self.data.get(record)}" + "\n"
         return result.strip()
 
@@ -153,107 +136,4 @@ book.delete("Jane")
 
 
 
-
-
-
-# def input_error_decorator(func):
-#     def inner(*args, **kwargs):
-#         try:
-#             return func(*args, **kwargs)
-#         except KeyError:
-#             return "Контакт не знайдено. Будь ласка, перевірте правильність введеного імені."
-#         except IndexError:
-#             return "Недостатньо параметрів для виконання команди. Будь ласка, додайте необхідні аргументи."
-#         except ValueError:
-#             return "Недостатньо значень для виконання команди. Додайте будь ласка Ім'я та номер телефону."
-#     return inner
-
-# def parse_input(user_input: str):
-#     if user_input.strip() == "":
-#         return "", []
-#     cmd, *args = user_input.split()
-#     cmd = cmd.strip().lower()
-#     return cmd, *args
-
-# def show_contacts(contacts:dict[str, str]):
-#     if len(contacts) == 0:
-#         return "Список контактів порожній."
-#     result = "Контакти:\n"
-#     for name, phone in contacts.items():
-#         result += f"{name}: {phone}\n"
-#     return(result.strip())
-
-# def check_phone(phone: str) -> bool:
-#     match = re.match(r'^\+?\d{7,15}$', phone)
-#     return match is not None
-
-# @input_error_decorator 
-# def change_contact(contacts:dict[str, str], *param) -> str:
-#     name, phone = param
-#     if name in contacts:
-#         if check_phone(phone):
-#             contacts[name] = phone
-#             return("Контакт оновлено.")
-#         else:
-#             return("Невірний формат номера телефону.")
-#     else:
-#         return("Контакт не знайдено.")
-
-# @input_error_decorator
-# def add_contact(contacts:dict[str, str], *param) -> str:
-#     name, phone = param
-#     contacts[name] = phone
-#     return("Контакт додано.")
-
-# @input_error_decorator
-# def del_contact(contacts:dict[str, str], *param) -> str:
-#     name = param[0]
-#     # if name in contacts:
-#     del contacts[name]
-#     return("Контакт видалено.")
-
-# @input_error_decorator
-# def show_phone(contacts:dict[str, str], *param) -> str:
-#     name = param[0]
-#     return contacts.get(name, "Контакт не знайдено.")
-
-# def main():
-#     cmd = ""
-#     contacts = {}
-#     print('Welcome to the assistant bot!')
-#     while True:
-#         cmd, *param = parse_input(input("Ведіть команду: "))
-
-#         match cmd:
-#             case "exit":
-#                 print("Бувай!")
-#                 break
-#             case "add":
-#                 print(add_contact(contacts, *param))
-#             case "change":
-#                 print(change_contact(contacts, *param))
-#             case "phone":
-#                 print(show_phone(contacts, *param))
-#             case 'all':
-#                 print(show_contacts(contacts))
-#             case 'del':
-#                 print(del_contact(contacts, *param))
-#             case "hello":
-#                 print("Чим я можу вам допомогти?")
-#             case "help":
-#                 print("Список всіх команд:")
-#                 print("hello - привітання")
-#                 print("add <ім'я> <номер телефону> - додати новий контакт")
-#                 print("change <ім'я> <номер телефону> - змінити існуючий контакт")
-#                 print("phone <ім'я> - показати номер телефону контакта")
-#                 print("all - показати всі контакти")
-#                 print("del <ім'я> - видалити контакт")
-#                 print("exit - закрити чат")
-#             case "":
-#                 print("Будь ласка, введіть команду. Для списку команд введіть 'help'.")
-#             case _:
-#                 print("Вибачте, я не знаю таку команду.")
-
-# if __name__ == "__main__":
-#     main()
 
