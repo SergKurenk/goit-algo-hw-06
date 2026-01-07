@@ -1,8 +1,8 @@
 from collections import UserDict
 import re
 
-class MyExceptionValueError(Exception):
-    pass
+# class MyExceptionValueError(Exception):
+#     pass
 
 class Field: #Базовий клас для полів запису.
     def __init__(self, value):
@@ -21,7 +21,8 @@ class Phone(Field): #Клас для зберігання номера теле�
     def __init__(self, value):
         match = re.match(r'^\d{10}$', value)
         if match is None:
-            raise MyExceptionValueError(f"Invalid phone number format: {value}")
+            # raise MyExceptionValueError(f"Invalid phone number format: {value}")
+            raise ValueError(f"Invalid phone number format: {value}")
         super().__init__(value)
 
 # 2. Клас Record:
@@ -38,29 +39,47 @@ class Record: #Клас для зберігання інформації про 
 
     def add_phone(self, phone_number: str):
         phone = Phone(phone_number)
-        self.phones.append(phone.value)
+        self.phones.append(phone)
     
     def remove_phone(self, phone_number: str):
-        try:
-            self.phones.remove(str(Phone(phone_number)))
-        except:
-            raise KeyError("Phone number not found.")
+        phone_num = Phone(phone_number)
+        phone = self.find_phone(phone_num.value)
+
+        if phone == None:
+            raise ValueError("Phone number not found.")
+        self.phones.remove(phone)
+        # try:
+        #     phone = Phone(phone_number)
+        #     self.phones = [x for x in self.phones if x.value != phone.value]
+        #     # self.phones.remove(phone)
+        # except:
+        #     raise KeyError("Phone number not found.")
     
     def edit_phone(self, old_phone_number: str, new_phone_number: str):
-        phone = Phone(new_phone_number)
-        for i, phone in enumerate(self.phones):
-            if phone == old_phone_number:
-                self.phones[i] = new_phone_number
+        new_phone = Phone(new_phone_number)
+        old_phone = Phone(old_phone_number)
+        
+        phone = self.find_phone(old_phone.value)
+
+        if phone is None:
+            raise ValueError("Old phone number not found.")
+
+        phone.value = new_phone.value
+        
+        # for i, phone in enumerate(self.phones):
+        #     if phone.value == old_phone.value:
+        #         self.phones[i] = new_phone
             
     def find_phone(self, phone_number: str):
+        f_phone = Phone(phone_number)
         for phone in self.phones:
-            if phone == phone_number:
+            if phone.value == f_phone.value:
                 return phone
         return None
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
-
+        # return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 # 1. Клас AddressBook:
 #     Має наслідуватись від класу UserDict .
 #     Реалізовано метод add_record, який додає запис до self.data. Записи Record у AddressBook зберігаються як значення у словнику. В якості ключів використовується значення Record.name.value.
@@ -68,8 +87,8 @@ class Record: #Клас для зберігання інформації про 
 #     Реалізовано метод delete, який видаляє запис за ім'ям.
 #     Реалізовано магічний метод __str__ для красивого виводу об’єкту класу AddressBook .
 class AddressBook(UserDict): #Клас для зберігання та управління записами.
-    def __init__(self):
-        self.data = {}
+    # def __init__(self):
+    #     self.data = {}
 
     def __str__(self):
         result = "Address Book:\n"
@@ -114,13 +133,13 @@ jane_record.add_phone("9876543210")
 book.add_record(jane_record)
 
 # Виведення всіх записів у книзі
-    
 print(book)
 
 # Знаходження та редагування телефону для John
 john = book.find("John")
 john.edit_phone("1234567890", "1112223333")
-
+john.add_phone("0000000000")
+john.remove_phone("0000000000") 
 print(john)  # Виведення: Contact name: John, phones: 1112223333; 5555555555
 
 # Пошук конкретного телефону у записі John
